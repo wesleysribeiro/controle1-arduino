@@ -25,10 +25,11 @@ enum Signal {Step = 0, UpRamp, DownRamp};
 // Inicializacao padrao
 Signal current_signal = UpRamp;
 // Frequencia de amostragem
-unsigned long current_frequency = 10;
+unsigned long current_frequency = 1;
 double interval = ((double) 1 / (double)current_frequency);
 // Valor maximo a ser atingido
 double output_value = 10;
+double current_time = 0;
 
 // Le as instrucoes via comunicacao serial enviadas pelo computador
 // e preenche:
@@ -96,8 +97,6 @@ void readInstructions() {
         switch(substringCounter) {
           case 0:
             signalRead = currentValue;
-            Serial.print("Signal read:");
-            Serial.println(signalRead);
             break;
           case 1:
             sampling_frequency = currentValue;
@@ -129,6 +128,7 @@ void readInstructions() {
   if (sampling_frequency != current_frequency) {
     current_frequency = sampling_frequency;
     interval = ((double) 1 / (double)sampling_frequency);
+    counter = 0;
   }
 }
 
@@ -199,6 +199,7 @@ void executeInstructions() {
 // | tempo decorrido em segundos, Valor de tensão (V), Frequencia de amostragem (Hz) |
 // -----------------------------------------------------------------------------------
 void sendSamplingData() {
+  current_time = counter * ((double) 1 / (double)current_frequency);
   Serial.print(counter * ((double) 1 / (double)current_frequency), 10);
   Serial.print(',');
   Serial.print(current_value, 10);
